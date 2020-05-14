@@ -9,7 +9,7 @@
 import UIKit
 
 /// The custom WebView used in each page
-open class FolioReaderWebView: UIWebView {
+open class FolioReaderWebView: WKWebView {
     var isColors = false
     var isShare = false
     var isOneWord = false
