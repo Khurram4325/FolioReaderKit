@@ -334,22 +334,22 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
 
     /// Get internal page offset before layout change
     private func updatePageOffsetRate() {
-        guard let currentPage = self.currentPage, let webView = currentPage.webView else {
+        guard let currentPage = self.currentPage, let wkWebView = currentPage.wkWebView else {
             return
         }
 
-        let pageScrollView = webView.scrollView
+        let pageScrollView = wkWebView.scrollView
         let contentSize = pageScrollView.contentSize.forDirection(withConfiguration: self.readerConfig)
         let contentOffset = pageScrollView.contentOffset.forDirection(withConfiguration: self.readerConfig)
         self.pageOffsetRate = (contentSize != 0 ? (contentOffset / contentSize) : 0)
     }
 
     func setScrollDirection(_ direction: FolioReaderScrollDirection) {
-        guard let currentPage = self.currentPage, let webView = currentPage.webView else {
+        guard let currentPage = self.currentPage, let wkWebView = currentPage.wkWebView else {
             return
         }
 
-        let pageScrollView = webView.scrollView
+        let pageScrollView = wkWebView.scrollView
 
         // Get internal page offset before layout change
         self.updatePageOffsetRate()
@@ -448,12 +448,12 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
 
         cell.setup(withReaderContainer: readerContainer)
         cell.pageNumber = indexPath.row+1
-        cell.webView?.scrollView.delegate = self
+        cell.wkWebView?.scrollView.delegate = self
         if #available(iOS 11.0, *) {
-            cell.webView?.scrollView.contentInsetAdjustmentBehavior = .never
+            cell.wkWebView?.scrollView.contentInsetAdjustmentBehavior = .never
         }
-        cell.webView?.setupScrollDirection()
-        cell.webView?.frame = cell.webViewFrame()
+        cell.wkWebView?.setupScrollDirection()
+        cell.wkWebView?.frame = cell.webViewFrame()
         cell.delegate = self
         cell.backgroundColor = .clear
 
@@ -578,7 +578,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         scrollScrubber?.setSliderVal()
 
         // After rotation fix internal page offset
-        var pageOffset = (currentPage.webView?.scrollView.contentSize.forDirection(withConfiguration: self.readerConfig) ?? 0) * pageOffsetRate
+        var pageOffset = (currentPage.wkWebView?.scrollView.contentSize.forDirection(withConfiguration: self.readerConfig) ?? 0) * pageOffsetRate
 
         // Fix the offset for paged scroll
         if (self.readerConfig.scrollDirection == .horizontal && self.pageWidth != 0) {
@@ -587,7 +587,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         }
 
         let pageOffsetPoint = self.readerConfig.isDirection(CGPoint(x: 0, y: pageOffset), CGPoint(x: pageOffset, y: 0), CGPoint(x: 0, y: pageOffset))
-        currentPage.webView?.scrollView.setContentOffset(pageOffsetPoint, animated: true)
+        currentPage.wkWebView?.scrollView.setContentOffset(pageOffsetPoint, animated: true)
     }
 
     override open func willAnimateRotation(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
@@ -649,7 +649,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
 
         scrollScrubber?.setSliderVal()
 
-        if let readingTime = currentPage.webView?.js("getReadingTime()") {
+        if let readingTime = currentPage.wkWebView?.js("getReadingTime()") {
             pageIndicatorView?.totalMinutes = Int(readingTime)!
         } else {
             pageIndicatorView?.totalMinutes = 0
@@ -663,10 +663,10 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
     }
 
     func pagesForCurrentPage(_ page: FolioReaderPage?) {
-        guard let page = page, let webView = page.webView else { return }
+        guard let page = page, let webView = page.wkWebView else { return }
 
         let pageSize = self.readerConfig.isDirection(pageHeight, self.pageWidth, pageHeight)
-        let contentSize = page.webView?.scrollView.contentSize.forDirection(withConfiguration: self.readerConfig) ?? 0
+        let contentSize = page.wkWebView?.scrollView.contentSize.forDirection(withConfiguration: self.readerConfig) ?? 0
         self.pageIndicatorView?.totalPages = ((pageSize != 0) ? Int(ceil(contentSize / pageSize)) : 0)
 
         let pageOffSet = self.readerConfig.isDirection(webView.scrollView.contentOffset.x, webView.scrollView.contentOffset.x, webView.scrollView.contentOffset.y)
@@ -820,8 +820,8 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         // Need check page orientation (v/h) and make correct calc for vertical
         guard
             let cell = collectionView.cellForItem(at: getCurrentIndexPath()) as? FolioReaderPage,
-            let contentOffset = cell.webView?.scrollView.contentOffset,
-            let contentOffsetXLimit = cell.webView?.scrollView.contentSize.width else {
+            let contentOffset = cell.wkWebView?.scrollView.contentOffset,
+            let contentOffsetXLimit = cell.wkWebView?.scrollView.contentSize.width else {
                 completion?()
                 return
         }
@@ -839,7 +839,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
     }
 
     public func getCurrentPageItemNumber() -> Int {
-        guard let page = currentPage, let webView = page.webView else { return 0 }
+        guard let page = currentPage, let webView = page.wkWebView else { return 0 }
         
         let pageSize = readerConfig.isDirection(pageHeight, pageWidth, pageHeight)
         let pageOffSet = readerConfig.isDirection(webView.scrollView.contentOffset.x, webView.scrollView.contentOffset.x, webView.scrollView.contentOffset.y)
@@ -852,7 +852,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         guard let page = currentPage else { return 0 }
         
         let pageSize = self.readerConfig.isDirection(pageHeight, self.pageWidth, pageHeight)
-        let contentSize = page.webView?.scrollView.contentSize.forDirection(withConfiguration: self.readerConfig) ?? 0
+        let contentSize = page.wkWebView?.scrollView.contentSize.forDirection(withConfiguration: self.readerConfig) ?? 0
         let totalPages = ((pageSize != 0) ? Int(ceil(contentSize / pageSize)) : 0)
         let currentPageItem = getCurrentPageItemNumber()
         
@@ -873,7 +873,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         // Need check page orientation (v/h) and make correct calc for vertical
         guard
             let cell = collectionView.cellForItem(at: getCurrentIndexPath()) as? FolioReaderPage,
-            let contentOffset = cell.webView?.scrollView.contentOffset else {
+            let contentOffset = cell.wkWebView?.scrollView.contentOffset else {
                 completion?()
                 return
         }
@@ -895,7 +895,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         // Need check page orientation (v/h) and make correct calc for vertical
         guard
             let cell = collectionView.cellForItem(at: getCurrentIndexPath()) as? FolioReaderPage,
-            let contentSize = cell.webView?.scrollView.contentSize else {
+            let contentSize = cell.wkWebView?.scrollView.contentSize else {
                 completion?()
                 return
         }
@@ -921,7 +921,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         // Need check page orientation (v/h) and make correct calc for vertical
         guard
             let cell = collectionView.cellForItem(at: getCurrentIndexPath()) as? FolioReaderPage,
-            let contentSize = cell.webView?.scrollView.contentSize else {
+            let contentSize = cell.wkWebView?.scrollView.contentSize else {
                 delegate?.pageItemChanged?(getCurrentPageItemNumber())
                 completion?()
                 return
@@ -1075,7 +1075,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
     @objc func shareChapter(_ sender: UIBarButtonItem) {
         guard let currentPage = currentPage else { return }
 
-        if let chapterText = currentPage.webView?.js("getBodyText()") {
+        if let chapterText = currentPage.wkWebView?.js("getBodyText()") {
             let htmlText = chapterText.replacingOccurrences(of: "[\\n\\r]+", with: "<br />", options: .regularExpression)
             var subject = readerConfig.localizedShareChapterSubject
             var html = ""
@@ -1203,8 +1203,8 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         }
 
         if let currentPage = currentPage {
-            currentPage.webView?.createMenu(options: true)
-            currentPage.webView?.setMenuVisible(false)
+            currentPage.wkWebView?.createMenu(options: true)
+            currentPage.wkWebView?.setMenuVisible(false)
         }
 
         scrollScrubber?.scrollViewWillBeginDragging(scrollView)
@@ -1222,7 +1222,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         let scrollType: ScrollType = ((isCollectionScrollView == true) ? .chapter : .page)
 
         // Update current reading page
-        if (isCollectionScrollView == false), let page = currentPage, let webView = page.webView {
+        if (isCollectionScrollView == false), let page = currentPage, let webView = page.wkWebView {
 
             let pageSize = self.readerConfig.isDirection(self.pageHeight, self.pageWidth, self.pageHeight)
             let contentOffset = webView.scrollView.contentOffset.forDirection(withConfiguration: self.readerConfig)
@@ -1446,7 +1446,7 @@ extension FolioReaderCenter: FolioReaderPageDelegate {
         
         if (readerConfig.scrollDirection == .horizontalWithVerticalContent),
             let offsetPoint = self.currentWebViewScrollPositions[page.pageNumber - 1] {
-            page.webView?.scrollView.setContentOffset(offsetPoint, animated: false)
+            page.wkWebView?.scrollView.setContentOffset(offsetPoint, animated: false)
         }
         
         // Pass the event to the centers `pageDelegate`

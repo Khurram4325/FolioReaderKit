@@ -241,13 +241,13 @@ class ScrollScrubber: NSObject, UIScrollViewDelegate {
     // MARK: - utility methods
 
     fileprivate func scrollView() -> UIScrollView? {
-        return delegate?.currentPage?.webView?.scrollView
+        return delegate?.currentPage?.wkWebView?.scrollView
     }
 
     fileprivate func height() -> CGFloat {
         guard let currentPage = delegate?.currentPage,
             let pageHeight = folioReader.readerCenter?.pageHeight,
-            let webView = currentPage.webView else {
+            let webView = currentPage.wkWebView else {
                 return 0
         }
 
@@ -255,7 +255,7 @@ class ScrollScrubber: NSObject, UIScrollViewDelegate {
     }
     
     fileprivate func scrollTop() -> CGFloat {
-        guard let currentPage = delegate?.currentPage, let webView = currentPage.webView else {
+        guard let currentPage = delegate?.currentPage, let webView = currentPage.wkWebView else {
             return 0
         }
         return webView.scrollView.contentOffset.forDirection(withConfiguration: readerConfig)

@@ -292,7 +292,7 @@ function playAudioFragmentID(fragmentID) {
 }
 
 /**
- Go To Element - scrolls the webview to the requested element
+ Go To Element - scrolls the wkWebview to the requested element
  */
 function goToEl(el) {
     var top = document.body.scrollTop;

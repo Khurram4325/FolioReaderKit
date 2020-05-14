@@ -176,7 +176,7 @@ open class FolioReaderAudioPlayer: NSObject {
     @objc func play() {
         if book.hasAudio {
             guard let currentPage = self.folioReader.readerCenter?.currentPage else { return }
-            currentPage.webView?.js("playAudio()")
+            currentPage.wkWebView?.js("playAudio()")
         } else {
             self.readCurrentSentence()
         }
@@ -382,7 +382,7 @@ open class FolioReaderAudioPlayer: NSObject {
         }
 
         let playbackActiveClass = book.playbackActiveClass
-        guard let sentence = currentPage.webView?.js("getSentenceWithIndex('\(playbackActiveClass)')") else {
+        guard let sentence = currentPage.wkWebView?.js("getSentenceWithIndex('\(playbackActiveClass)')") else {
             if (readerCenter.isLastPage() == true) {
                 self.stop()
             } else {
@@ -410,7 +410,7 @@ open class FolioReaderAudioPlayer: NSObject {
             if synthesizer.isSpeaking {
                 stopSynthesizer(immediate: false, completion: {
                     if let currentPage = self.folioReader.readerCenter?.currentPage {
-                        currentPage.webView?.js("resetCurrentSentenceIndex()")
+                        currentPage.wkWebView?.js("resetCurrentSentenceIndex()")
                     }
                     self.speakSentence()
                 })
@@ -423,7 +423,7 @@ open class FolioReaderAudioPlayer: NSObject {
     // MARK: - Audio timing events
 
     fileprivate func startPlayerTimer() {
-        // we must add the timer in this mode in order for it to continue working even when the user is scrolling a webview
+        // we must add the timer in this mode in order for it to continue working even when the user is scrolling a wkWebview
         playingTimer = Timer(timeInterval: 0.01, target: self, selector: #selector(playerTimerObserver), userInfo: nil, repeats: true)
         RunLoop.current.add(playingTimer, forMode: RunLoop.Mode.common)
     }
